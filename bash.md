@@ -180,7 +180,12 @@ Now, create a configuration directory for powerline in your home directory and c
     $ mkdir ~/.config/powerline
     $ cp -r /usr/local/lib/python3.6/site-packages/powerline/config_files/ ~/.config/powerline/
 
-### Show Branch In Prompt ###
+### Git Status ###
+
+#### Install Powerline Segment for Showing the Status of a Git Repository ####
+https://pypi.org/project/powerline-gitstatus/
+
+#### Show Branch In Prompt ####
 
 Either modify `~/.config/powerline/config.json` or make a local copy (`~/.config/powerline`) and change `shell` -> `theme` from `default` to `default_leftonly`.
 
