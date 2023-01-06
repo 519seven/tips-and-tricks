@@ -69,6 +69,7 @@ pipenv shell
 ## Pip Freeze ##
 Rather than  use `pip freeze` in your pipenv environment, you can use `pipenv` itself to create `requirements.txt`
 ```bash
+# as of 01/2023 this is the proper way to do this
 pipenv requirements > requirements.txt
 ```
 ## Errors ##
