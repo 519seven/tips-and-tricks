@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# env var
+# convert time to seconds
+# SSHPASS
+# update Redis
+# python one-liner to get json value from JSON returned from URL
+# Linux:
+# - free cache
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# env var
+if [[ -z "${PWD}" ]]; then PWD="default_value"; else PWD="${PWD}"; fi
+
+# or using a short-hand version
+[[ -z "${PWD}" ]] && PWD='default_value' || PWD="${PWD}"
+
+# or even shorter use
+PWD="${PWD:-default_value}"
+
+CURLOPTS="-s -k -ucpx:$PWD"
+SSHPASS=$(which SSHPASS)
+SSHOPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+
+IPLIST="3.2.1.0"
+KEYNAME="nonexistent_prefilter"
+
+freeCache() {
+  $SSHPASS -p $PWD ssh $SSHOPTS USER@$TARGET_HOST 'free && sync'
+  $SSHPASS -p $PWD ssh $SSHOPTS USER@$TARGET_HOST 'echo 3 | sudo tee /proc/sys/vm/drop_caches'
+  $SSHPASS -p $PWD ssh $SSHOPTS USER@$TARGET_HOST 'free'
+}
+# Function to just return the value of a JSON key
+getJsonVal() {
+  item_of_interest=$1
+  python -c "import json,sys; sys.stdout.write(json.dumps(json.load(sys.stdin)$item_of_interest).replace('\"',''))";
+}
+
+### Before running the test, empty the machine's cache
+freeCache
+
+### First, grab some time boundaries, do some time manipulation
+
+  # first_connection
+  fconn=$(curl $CURLOPTS -XGET "https://${TARGET_HOST}/api/4.0/stats/vital" | getJsonVal "['first_connection']")
+  # first index
+  findex=$(curl $CURLOPTS -XGET "https://${TARGET_HOST}/api/4.0/stats/vital" | getJsonVal "['first_index']")
+  # first packet
+  fpkt=$(curl $CURLOPTS -XGET "https://${TARGET_HOST}/api/4.0/stats/vital" | getJsonVal "['first_packet']")
+
+  # Convert TIME_WINDOW to seconds
+  re='^[0-9]+$'
+  if [[ $TIME_WINDOW =~ $re ]]; then
+    # If it's a number, then treat it as a time window
+    hrs=$(echo $TIME_WINDOW | cut -f1 -d"-")
+    secs=$(($hrs*60*60))
+    stime=$(date --date="$secs seconds ago" +"%s")
+    # Is the requested TIME_WINDOW greater than what the box has on-disk?
+    [[ $stime -le $findex ]] && (echo "stime is more recent than fconn, reassigning findex to stime"; stime=$findex;) || echo "findex is before stime, leaving stime as-is (${TIME_WINDOW})"
+    echo $stime
+  else
+    # If it's not a number, then treat it as "MAX"; i.e. assign stime the value of first_packet_index
+    stime=$fconn
+  fi
+
+  etime="now"
+  search_id=$(curl $CURLOPTS -XPOST -d "stime=${stime}&etime=${etime}&limit=250&IPLIST=${IPLIST}" "https://${TARGET_HOST}/api/4.0/search" | getJsonVal "['search_id']")
+  sleep 5
+  
+### Second, check for status and grab elapsed time when it's complete
+  while : ; do
+    # To view JSON output, uncomment the following line
+    # curl -k -ucpx:$PWD -XGET https://${TARGET_HOST}/api/4.0/search/${search_id}/status
+    output_index_status=$(curl $CURLOPTS -XGET https://${TARGET_HOST}/api/4.0/search/${search_id}/status | getJsonVal "['output_index_status']")
+    if [ "$output_index_status" == 'done' ]; then
+      break
+    elif [ "$output_index_status" == "-2" ]; then
+      echo 'Search is queued on the PX.  This is NOT good and we ought to exit'
+      exit 2
+    fi
+    sleep 60
+  done
+
+### Third, update Redis on the TARGET_HOST with this search's stats
+  output_elapsed=$(curl $CURLOPTS -XGET https://${TARGET_HOST}/api/4.0/search/${search_id}/status | getJsonVal "['output_elapsed']")
+  oerounded=$(printf '%.*f' 0 $output_elapsed)
+  echo "Seconds: $output_elapsed Minutes: $(($oerounded/60))"
+
+  output_index_elapsed=$(curl $CURLOPTS -XGET https://${TARGET_HOST}/api/4.0/search/${search_id}/status | getJsonVal "['output_index_elapsed']")
+  oierounded=$(printf '%.*f' 0 $output_index_elapsed)
+  echo "Seconds: $output_index_elapsed Minutes: $(($oierounded/60))"
+
+  output_index_foundRecords=$(curl $CURLOPTS -XGET https://${TARGET_HOST}/api/4.0/search/${search_id}/status | getJsonVal "['output_index_foundRecords']")
+  echo $output_index_foundRecords
+  
+  # Now we have search_id, output_elapsed, and output_index_elapsed
+  # Put them into redis on the same PX so collectd can grab them
+  $SSHPASS -p $PWD ssh $SSHOPTS USER@$TARGET_HOST "sudo redis-cli -s /tmp/redis.sock HSET stats_$KEYNAME output_elapsed $oerounded"
+  $SSHPASS -p $PWD ssh $SSHOPTS USER@$TARGET_HOST "sudo redis-cli -s /tmp/redis.sock HSET stats_$KEYNAME output_index_elapsed $oierounded"
+  $SSHPASS -p $PWD ssh $SSHOPTS USER@$TARGET_HOST "sudo redis-cli -s /tmp/redis.sock HSET stats_$KEYNAME output_index_found_records $output_index_foundRecords"
+
+# Write search stats out to this job's stdout for long-term storage
+curl $CURLOPTS -XGET https://${TARGET_HOST}/api/4.0/search/${search_id}/status
