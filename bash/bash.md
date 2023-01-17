@@ -39,6 +39,18 @@ my_array+=("${element_val_1}")
 ```bash
 echo "${my_array[@]}"
 ```
+# Conditionals #
+## `if..else` ##
+### Return Exit Code From Command ###
+```bash
+if ! grep jenkins /etc/passwd | wc -l; then
+        if [ "$VERBOSE" -eq "1" ]; then echo "jenkins user not found, adding jenkins user"
+        sudo useradd -d /home/jenkins -G sudo -m -s /bin/bash jenkins
+        echo -e "${PWD}\n${PWD}" | sudo -S passwd jenkins
+else
+        if [ "$VERBOSE" -eq "1" ]; then echo "User found, checking sudo membership"
+fi
+```
 
 # Environment #
 ## Redirection ##
