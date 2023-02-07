@@ -404,6 +404,17 @@ VALUES ( <value1>,<value2> );
 
 ## Data ##
 
+### Record Output to File ###
+```sql
+# turn on output to file setting
+postgres-db=> \o filename.txt
+# run your query
+postgres-db=> SELECT * FROM measurements WHERE date_utc => '2022-12-12 00:30:00' ORDER BY _id;
+# turn off output to file setting
+postgres-db=> \o
+```
+You can find your file in `<current_dir>/filename.txt`
+
 ### Read All Data ###
 [Reference](http://www.postgresql.org/docs/current/static/sql-select.html)
 ```sql
