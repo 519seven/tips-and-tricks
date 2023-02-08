@@ -1,19 +1,19 @@
-Python Virtual Environment Tips & Tricks
-=
+# Python Virtual Environment Tips & Tricks #
 
-Create folder
--
+## PIPENV ##
+
+### Create folder
+
     mkdir ~/Repos/stash/toolbox/new-feature
     cd !^ (or cd $_)
 
-Set up
--
+### Set up
 
-Install pipenv if not already installed
+#### Install pipenv if not already installed
 
     python3 -m pip install --user pipenv
 
-Install Python version
+### Install Python version
 
 ```bash
 # get list of versions available
@@ -38,8 +38,8 @@ exit    # exit from your existing venv
 pipenv --rm
 ```
 
-### Option A: Install a base package (pypi is used as an example) ###
-#### Create new virtual environment ####
+#### Option A: Install a base package (pypi is used as an example) ###
+##### Create new virtual environment ####
 ```bash
 pyenv install 3.9.7
 mkdir .venv
@@ -47,26 +47,26 @@ pipenv --python 3.9.7
 pipenv install <package>
 ```
 
-### Activate workspace (`Pipfile` and `Pipfile.lock` are created) ###
+#### Activate workspace (`Pipfile` and `Pipfile.lock` are created) ###
     
 ```bash
 pyenv shell 3.9.7
 # Or
 pipenv shell
 ```
-### Run application ###
+#### Run application ###
 Several MAIA apps are designed to run like this:
 ```bash
 pipenv run python app.py
 ```
 
-## Activation Workflow ##
+### Activation Workflow ##
 When activating an existing workspace, typically you'd want to run these commands:
 ```bash
 pipenv install
 pipenv shell
 ```
-## Pip Freeze ##
+### Pip Freeze ##
 Rather than  use `pip freeze` in your pipenv environment, you can use `pipenv` itself to create `requirements.txt`
 ```bash
 # if you do not have a Pipfile.lock create it first
@@ -74,7 +74,7 @@ pipenv install
 # as of 01/2023 this is the proper way to do this
 pipenv requirements > requirements.txt
 ```
-## Errors ##
+### Errors ##
 ### When Installing ###
 You may see an error similar to this:
 
@@ -83,7 +83,7 @@ You may see an error similar to this:
 
 This may happen if you already have met the requirement; e.g. the package is already installed (or the package is installed by default)
 
-### When "Freezing" ###
+#### When "Freezing" ###
 When attempting to list your environment's requirements using `pipenv requirements > requirements.txt` you may see this error:
 
     FileNotFoundError: [Errno 2] No such file or directory: '/Users/pakey/Repos/gitlab/surface-monitor-test/Pipfile.lock'
@@ -94,7 +94,7 @@ In order to create `Pipfile.lock` file, you simply issue:
 
 Now, your `Pipfile.lock` file exists.
 
-### When Activating ###
+#### When Activating ###
 When attempting to activate your virtual environment, you may see the following error:
 ```bash
 $ pipenv shell
@@ -139,10 +139,10 @@ Once your environment activates successfully, check your python version to ensur
 python --version
 ```
 
-#### Commit ####
+##### Commit ####
 When your happy, commit `Pipfile` to git as "Initial commit for pipenv"
 
-### pipenv install ###
+#### pipenv install ###
 ```bash
 (maia-jes-executor) [pakey@LALAL0721100475 maia-models (python-3.9.7)]$ pipenv install
 Pipfile.lock (78422d) out of date, updating to (652328)...
@@ -179,7 +179,7 @@ Python 3.9.7
 This is caused by an invalid `PATH`.  Follow along [here](https://github.com/pypa/pipenv/issues/4942#issuecomment-1156694881) but the gist is make sure you exit from a virtualenv before removing said virtualenv.  If a virtualenv is removed, make sure its path in no longer in your `PATH`.
 
 
-## Update Python Version ##
+### Update Python Version ##
 
 ```bash
 # Install Python version of your choice
@@ -190,19 +190,19 @@ vi Pipfile
 pipenv update --python 3.9.7
 ```
 
-## Other Errors ##
+### Other Errors ##
 
-### Error: ###
+#### Error: ###
 
     pipenv install --user paramiko
     Usage: pipenv install [OPTIONS] [PACKAGES]...
     ERROR:: --system is intended to be used for pre-existing Pipfile installation, not installation of specific packages. Aborting.
 
-### Problem: ###
+#### Problem: ###
 
 There is already a virtual environment present.
 
-### Solution: ###
+#### Solution: ###
 
 Check where virtual venv is
 
@@ -262,20 +262,43 @@ Examples:
 
     pipenv install --dev
 
-Set up virtual environment
-=
-Install your Python version
+## Pyenv ##
 
-    pyenv install 3.9.15
+### Install pyenv
 
-Create the virtual environment
+    $ curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+    
+Insert the following into ~/.bashrc
 
+    export PATH="/home/vagrant/.pyenv/bin:$PATH"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+    
+### Set up virtual environment
+
+#### Install your Python version
+
+    pyenv install 3.10.8
+
+#### Create the virtual environment
+
+    # Most recently used this method
+    pyenv virtualenv 3.6.6 app
+    
     virtualenv -p $(which python3) my_env
+    
 
-Activate it
+#### Activate it
+    
+    # Most recently used this method
+    pyenv activate app
     
     . ./my_env/bin/activate
 
-Check python version to make sure it's 3.9.15, etc.
+##### Deactivate it
+
+    pyenv deactivate app
+    
+#### Check python version
 
     python -V
