@@ -302,3 +302,13 @@ Insert the following into ~/.bashrc
 #### Check python version
 
     python -V
+    
+## PyVEnv
+
+### Create
+
+Creation of virtual environments is done by executing the pyvenv script:
+
+    pyvenv-3.6 --symlinks --prompt smjm-venv .venv/smjm-venv
+    pyvenv /path/to/new/virtual/environment
+
