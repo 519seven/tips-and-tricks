@@ -43,61 +43,59 @@ docker run                                     \
 neo4j:4.0.6
 ```
 
+### Override Entrypoint
+
+    docker run --rm -it --entrypoint /bin/bash smjm-daily
+    
 ### Detached
-```bash
-docker run -d <name>
-```
+
+    docker run -d <name>
+
 Example:
-```bash
-docker run -p 49160:8080 -d graphql-docker
-```
+
+    docker run -p 49160:8080 -d graphql-docker
+
 ### Add host entry (local DNS)
-```bash
-docker run -it --add-host=neo4j:[your-host-ip] user/test-neo4j:latest
-```
+
+    docker run -it --add-host=neo4j:[your-host-ip] user/test-neo4j:latest
+
 ### Run command on container
-```bash
-docker run -it api:DOIT bash -c 'find / -type f | sort  | xargs -I{} shasum -a 256 {}' > ~pakey/dockerfiles.api-doit.txt
-```
+
+    docker run -it api:DOIT bash -c 'find / -type f | sort  | xargs -I{} shasum -a 256 {}' > ~pakey/dockerfiles.api-doit.txt
 
 ## Exec
 
 Feed contents of file to remote command using exec
-```bash
-docker exec -i mycontainer <command> -t < <filename>
-```
+    docker exec -i mycontainer <command> -t < <filename>
 
 [Reference](https://stackoverflow.com/questions/53951136/pass-file-content-to-docker-exec)
 
 # Maintenance #
 
 ## List Containers ##
-```bash
-docker ps
-docker ps -a
-```
+
+    docker ps
+    docker ps -a
+
 ## List Images ##
-```bash
-docker images
-```
+
+    docker images
 
 ## Remove Container ##
-```bash
-docker rm <container_id>
-# Force
-docker rm -f <container_id>
-```
+
+    docker rm <container_id>
+    # Force
+    docker rm -f <container_id>
 
 ## Remove Image ##
 Will fail if there is a running instance of that image i.e. container
-```bash
-docker rmi <image_id>
-```
+
+    docker rmi <image_id>
+
 To force removal of image even if it is referenced in multiple repositories, i.e. same image id given multiple names/tags.
 Will still fail if there is a docker container referencing image
-```bash
-docker rmi -f <image_id>
-```
+
+    docker rmi -f <image_id>
 
 
 ---
