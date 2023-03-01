@@ -16,7 +16,7 @@ docker build -t <name> .
 
 Example:
 ```bash
-docker build . -t graphql-docker
+docker build -t graphql-docker .
 ```
 
 Verify image exists
