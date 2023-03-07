@@ -46,6 +46,10 @@ mkdir .venv
 pipenv --python 3.9.7
 pipenv install <package>
 ```
+As of Python3.6 pyvenv has been deprecated in favor of platform-python3.6 -m venv
+```bash
+/usr/libexec/platform-python3.6 -m venv <virtual-env-name>
+```
 
 #### Activate workspace (`Pipfile` and `Pipfile.lock` are created) ###
     
