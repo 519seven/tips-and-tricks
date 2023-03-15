@@ -122,6 +122,67 @@ hello
 z=${y^^}
 echo $z
 HELLO
+
+# POSIX standard
+# tr
+
+$ echo "$a" | tr '[:upper:]' '[:lower:]'
+hi all
+
+# AWK
+
+echo "$a" | awk '{print tolower($0)}'
+hi all
+
+# Non-POSIX
+# You may run into portability issues with the following examples:
+# Bash 4.0
+
+echo "${a,,}"
+hi all
+
+# sed
+
+echo "$a" | sed -e 's/\(.*\)/\L\1/'
+hi all
+
+# This also works:
+sed -e 's/\(.*\)/\L\1/' <<< "$a"
+hi all
+
+# Perl
+
+echo "$a" | perl -ne 'print lc'
+hi all
+
+# Bash
+
+lc(){
+    case "$1" in
+        [A-Z])
+        n=$(printf "%d" "'$1")
+        n=$((n+32))
+        printf \\$(printf "%o" "$n")
+        ;;
+        *)
+        printf "%s" "$1"
+        ;;
+    esac
+}
+word="I Love Bash"
+for((i=0;i<${#word};i++))
+do
+    ch="${word:$i:1}"
+    lc "$ch"
+done
+
+# [Source](https://stackoverflow.com/questions/2264428/how-to-convert-a-string-to-lower-case-in-bash)
+# Note: YMMV on this one. Doesn't work for me (GNU bash version 4.2.46 and 4.0.33)
+# (and same behaviour 2.05b.0 but nocasematch is not implemented)) even with using
+# shopt -u nocasematch;. Unsetting that nocasematch causes [[ "fooBaR" == "FOObar" ]]
+# to match OK BUT inside case weirdly [b-z] are incorrectly matched by [A-Z]. 
+# Bash is confused by the double-negative ("unsetting nocasematch")! :-)
+
 ```
 
 ## Newlines ##
