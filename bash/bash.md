@@ -108,6 +108,22 @@ Unset anything you see there that you want to get rid of
 
 # Strings #
 
+## Uppercase/Lowercase ##
+
+```bash
+x="HELLO"
+echo $x
+HELLO
+
+y=${x,,}
+echo $y
+hello
+
+z=${y^^}
+echo $z
+HELLO
+```
+
 ## Newlines ##
 
 ### References ###
