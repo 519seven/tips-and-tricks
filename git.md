@@ -2,6 +2,9 @@
 
 ## Setup ##
 
+### Git Prompt ###
+[The leading git prompt project out there](https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh)
+
 ## Cleanup ##
 
 ### Moving Master To Main
