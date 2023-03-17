@@ -5,6 +5,14 @@
 ### Git Prompt ###
 [The leading git prompt project out there](https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh)
 
+```bash
+# get git-prompt.sh
+$ curl -L https://raw.github.com/git/git/master/contrib/completion/git-prompt.sh > ~/.bash_git
+# add to .bashrc
+source ~/.bash_git
+# establish new session
+```
+
 ## Cleanup ##
 
 ### Moving Master To Main
