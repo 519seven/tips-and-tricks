@@ -23,6 +23,11 @@ psql --username=<username> --dbname=<database> --host=<hostname>
 \!
 ```
 
+### Connect to Database ###
+
+```sql
+\c <database_name>
+```
 
 ## Clear The Screen ##
 
@@ -128,12 +133,6 @@ pg_catalog.pg_get_userbyid(d.datdba) as "Owner"
 FROM pg_catalog.pg_database d
 WHERE d.datname = 'database_name'
 ORDER BY 1;
-```
-
-### Connect to Database ###
-
-```sql
-\c <database_name>
 ```
 
 ### Show Current Database ###
