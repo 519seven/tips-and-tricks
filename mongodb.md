@@ -16,3 +16,10 @@ db.acquisition.find({"status":"EXECUTING"});
  
 db.acquisition.find({"status":"PENDING"});
 ```
+
+## Find ##
+
+```bash
+db.production.find( { foo: /^bar$/i } );
+db.production.find( { foo: /.*bar.*/i } );
+```
